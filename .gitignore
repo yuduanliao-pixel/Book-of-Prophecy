@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# 虛擬環境
+.venv/
+venv/
+build-venv/
+
+# PyInstaller 中間產物（保留 build/build_exe.ps1）
+build/pyi-work/
+build/*.spec
+dist/
+
+# 匯出的排盤
+paipan_*.txt
+paipan_*.json
+
+# OS
+.DS_Store
+Thumbs.db
