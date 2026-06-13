@@ -1,0 +1,9 @@
+# 可選的「權威節氣覆蓋表」。引擎預設以內建 VSOP87 天文演算法計算（精度 ±1–2 分，
+# 已對照 timeanddate 天文金標準之春分/夏至驗證）；此表僅在「需與官方黃曆完全一致」時使用。
+# 表中有列者優先採用，未列者一律回落到 VSOP87。可自行增列官方黃曆時刻。
+# 欄位：year,name,local_time(YYYY-MM-DD HH:MM 之地方民用時),tz_hours,source
+year,name,local_time,tz_hours,source
+2026,立春,2026-02-04 04:02,8,香港天文台 HKO
+2026,春分,2026-03-20 22:46,8,timeanddate (UTC 14:46)
+2026,芒種,2026-06-05 23:48,8,香港天文台 HKO
+2026,夏至,2026-06-21 16:24,8,timeanddate (UTC 08:24)
