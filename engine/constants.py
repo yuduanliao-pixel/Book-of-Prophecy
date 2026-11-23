@@ -132,3 +132,50 @@ def xunkong(day_index: int):
     b1 = (10 - 2 * xun) % 12
     b2 = (11 - 2 * xun) % 12
     return DIZHI[b1], DIZHI[b2]
+
+
+# ══ 以下為命盤（八字／紫微）共用查表 ═══════════════════════
+# 天干陰陽（甲丙戊庚壬為陽）
+def gan_is_yang(gan: str) -> bool:
+    return TIANGAN.index(gan) % 2 == 0
+
+
+# 地支藏干（本氣、中氣、餘氣）
+CANGGAN = {
+    "子": "癸", "丑": "己癸辛", "寅": "甲丙戊", "卯": "乙",
+    "辰": "戊乙癸", "巳": "丙庚戊", "午": "丁己", "未": "己丁乙",
+    "申": "庚壬戊", "酉": "辛", "戌": "戊辛丁", "亥": "壬甲",
+}
+
+# 六十甲子納音（每兩柱一組，index = 干支序 // 2）
+NAYIN = [
+    "海中金", "爐中火", "大林木", "路旁土", "劍鋒金", "山頭火",
+    "澗下水", "城頭土", "白蠟金", "楊柳木", "泉中水", "屋上土",
+    "霹靂火", "松柏木", "長流水", "沙中金", "山下火", "平地木",
+    "壁上土", "金箔金", "覆燈火", "天河水", "大驛土", "釵釧金",
+    "桑柘木", "大溪水", "沙中土", "天上火", "石榴木", "大海水",
+]
+
+# 三合局、三會方（地支集合 → 五行）
+SANHE = {
+    frozenset("申子辰"): "水", frozenset("亥卯未"): "木",
+    frozenset("寅午戌"): "火", frozenset("巳酉丑"): "金",
+}
+SANHUI = {
+    frozenset("寅卯辰"): "木", frozenset("巳午未"): "火",
+    frozenset("申酉戌"): "金", frozenset("亥子丑"): "水",
+}
+
+
+def ganzhi_index(ganzhi: str) -> int:
+    """干支名 → 干支序號（0=甲子…59=癸亥）。"""
+    g, z = TIANGAN.index(ganzhi[0]), DIZHI.index(ganzhi[1])
+    for i in range(g, 60, 10):
+        if i % 12 == z:
+            return i
+    raise ValueError(f"無效干支：{ganzhi}")
+
+
+def nayin(ganzhi: str) -> str:
+    """干支 → 納音（如 戊辰 → 大林木）。"""
+    return NAYIN[ganzhi_index(ganzhi) // 2]
