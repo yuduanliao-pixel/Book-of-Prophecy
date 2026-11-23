@@ -51,9 +51,9 @@ def jd_from_gregorian(year: int, month: int, day: float) -> float:
 
 def gregorian_from_jd(jd: float):
     """儒略日 JD → (year, month, day, hour, minute)。"""
-    jd += 0.5
-    z = math.floor(jd)
-    f = jd - z
+    # 先四捨五入到整數分鐘再拆解，進位（含跨日）交給整數運算處理。
+    total_minutes = math.floor((jd + 0.5) * 1440 + 0.5)
+    z, minute_of_day = divmod(total_minutes, 1440)
     if z < 2299161:
         a = z
     else:
@@ -63,20 +63,10 @@ def gregorian_from_jd(jd: float):
     c = math.floor((b - 122.1) / 365.25)
     d = math.floor(365.25 * c)
     e = math.floor((b - d) / 30.6001)
-    day_frac = b - d - math.floor(30.6001 * e) + f
-    day = int(day_frac)
+    day = b - d - math.floor(30.6001 * e)
     month = e - 1 if e < 14 else e - 13
     year = c - 4716 if month > 2 else c - 4715
-    hf = (day_frac - day) * 24
-    hour = int(hf)
-    minute = int(round((hf - hour) * 60))
-    if minute == 60:
-        minute = 0
-        hour += 1
-    if hour == 24:
-        hour = 0
-        # 進位到隔日（顯示用，極少觸發）
-        return gregorian_from_jd(jd - 0.5 + 1)
+    hour, minute = divmod(minute_of_day, 60)
     return year, month, day, hour, minute
 
 

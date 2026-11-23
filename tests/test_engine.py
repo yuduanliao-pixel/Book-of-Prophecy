@@ -147,6 +147,17 @@ def test_cast_face_values():
     assert cast.make_line(["字", "字", "字"])["name"] == "老陰"   # 0背=6
 
 
+def test_gregorian_from_jd_rounding():
+    """接近午夜的時刻四捨五入到分鐘時須正確進位到隔日（舊版會無限遞迴）。"""
+    from engine import solar_terms as st
+    for args in [(2026, 6, 13, 2, 19), (2000, 1, 1, 0, 0), (2024, 2, 29, 23, 59)]:
+        y, m, d, h, mi = args
+        assert st.gregorian_from_jd(st.jd_from_gregorian(y, m, d + (h * 60 + mi) / 1440.0)) == args
+    late = (23 * 3600 + 59 * 60 + 45) / 86400.0                 # 23:59:45
+    assert st.gregorian_from_jd(st.jd_from_gregorian(2026, 6, 13 + late)) == (2026, 6, 14, 0, 0)
+    assert st.gregorian_from_jd(st.jd_from_gregorian(2026, 12, 31 + late)) == (2027, 1, 1, 0, 0)
+
+
 if __name__ == "__main__":
     funcs = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     passed = 0
