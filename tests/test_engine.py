@@ -158,6 +158,23 @@ def test_gregorian_from_jd_rounding():
     assert st.gregorian_from_jd(st.jd_from_gregorian(2026, 12, 31 + late)) == (2027, 1, 1, 0, 0)
 
 
+def test_fuyin_fanyin_marks():
+    # 火天大有 二、三爻動 → 火雷噬嗑：內卦乾化震，寅化寅、辰化辰 → 伏吟
+    z = zg.zhuang((1, 1, 1, 1, 0, 1), (False, True, True, False, False, False),
+                  day_gan="壬", day_zhi="寅", month_branch="亥", xunkong=("辰", "巳"))
+    assert z["changed"]["name"] == "火雷噬嗑"
+    assert "伏吟" in z["yaos"][1]["changed"]["marks"] and "伏吟" in z["yaos"][2]["changed"]["marks"]
+    assert z["fuyin"] == ["內卦"] and z["fanyin"] == []
+    # 坤為地 二、三爻動 → 內卦坤化巽：巳化亥、卯化酉 → 反吟
+    z = zg.zhuang((0, 0, 0, 0, 0, 0), (False, True, True, False, False, False), day_gan="甲")
+    assert "反吟" in z["yaos"][1]["changed"]["marks"] and "反吟" in z["yaos"][2]["changed"]["marks"]
+    assert z["fanyin"] == ["內卦"] and z["fuyin"] == []
+    # 一般動爻不標
+    z = zg.zhuang((1, 1, 1, 1, 1, 1), (True, False, False, False, False, False), day_gan="甲")
+    assert z["fuyin"] == [] and z["fanyin"] == []
+    assert not {"伏吟", "反吟"} & set(z["yaos"][0]["changed"]["marks"])
+
+
 if __name__ == "__main__":
     funcs = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     passed = 0

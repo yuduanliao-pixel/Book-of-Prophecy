@@ -1,4 +1,4 @@
-"""京房裝卦：定宮→世應→納甲納支→五行→六親→六獸→伏神，並標旬空、旺衰、動變。"""
+"""京房裝卦：定宮→世應→納甲納支→五行→六親→六獸→伏神，並標旬空、旺衰、動變、伏吟反吟。"""
 from __future__ import annotations
 
 from . import constants as C
@@ -101,6 +101,10 @@ def zhuang(lines, moving, day_gan, day_zhi=None, month_branch=None, xunkong=None
                 mark.append("回頭剋")
             if xunkong and czhi in xunkong:
                 mark.append("化空")
+            if czhi == zhi:
+                mark.append("伏吟")      # 化出之爻地支不變
+            if C.LIUCHONG.get(zhi) == czhi:
+                mark.append("反吟")      # 化出之爻與本爻相沖
             item["changed"] = {"gan": cgan, "zhi": czhi, "wuxing": cwx,
                                "liuqin": liuqin(pw, cwx), "marks": mark}
         yaos.append(item)
@@ -120,6 +124,15 @@ def zhuang(lines, moving, day_gan, day_zhi=None, month_branch=None, xunkong=None
                         "is_kong": bool(xunkong and r["zhi"] in xunkong),
                     }
 
+    # 內／外卦伏吟、反吟：該經卦有動爻，且其動爻全數伏吟（或全數反吟）
+    fuyin, fanyin = [], []
+    for label, positions in (("內卦", (1, 2, 3)), ("外卦", (4, 5, 6))):
+        marks = [yaos[p - 1]["changed"]["marks"] for p in positions if "changed" in yaos[p - 1]]
+        if marks and all("伏吟" in m for m in marks):
+            fuyin.append(label)
+        if marks and all("反吟" in m for m in marks):
+            fanyin.append(label)
+
     return {
         "base": base,
         "changed": changed,
@@ -130,4 +143,6 @@ def zhuang(lines, moving, day_gan, day_zhi=None, month_branch=None, xunkong=None
         "fushen": fushen,       # {爻位: 伏神資訊}
         "shi": shi, "ying": ying,
         "has_moving": has_moving,
+        "fuyin": fuyin,         # 伏吟所在（"內卦"／"外卦"）
+        "fanyin": fanyin,       # 反吟所在（爻反吟：動爻化出相沖）
     }
