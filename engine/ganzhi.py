@@ -87,9 +87,15 @@ def compute_sizhu(year, month, day, hour=12, minute=0,
     offset_from_yin = (month_branch_i - 2) % 12
     month_gan_i = (_five_tiger_month_gan_base(year_gan_i) + offset_from_yin) % 10
 
-    # ── 時柱（夜子時用當日日干；其餘用 day_gan_i）──
+    # ── 時柱（五鼠遁）──
+    # 23 時的子時屬次日之始：時干一律以「次日」日干起。
+    # zi_initial_23 的日柱已進到次日；midnight_00／split_zi 日柱留在當日，
+    # 故此處另取次日日干（如甲日 23:30 為丙子時，與次日 00:30 同柱）。
     hour_branch_i = ((hour + 1) // 2) % 12
-    base_hour_gan = _five_rat_hour_gan_base(day_gan_i)
+    hour_day_gan_i = day_gan_i
+    if hour >= 23 and day_boundary != "zi_initial_23":
+        hour_day_gan_i = (day_gan_i + 1) % 10
+    base_hour_gan = _five_rat_hour_gan_base(hour_day_gan_i)
     hour_gan_i = (base_hour_gan + hour_branch_i) % 10
 
     # ── 月令、旬空、節氣資訊 ──

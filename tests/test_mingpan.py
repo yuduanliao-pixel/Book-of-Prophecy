@@ -105,6 +105,16 @@ def test_bazi_against_reference():
             assert [x["start_year"] for x in D["list"]] == [x[1] for x in c["dy"]], c["i"]
 
 
+def test_bazi_night_zi_against_reference():
+    """23 時出生、日柱算當日的兩種策略：四柱對照（時干以次日日干起）。"""
+    cases = _load("bazi_night_zi.json")
+    assert len(cases) >= 50
+    for c in cases:
+        for policy in ("midnight_00", "split_zi"):
+            r = bazi.build_bazi(*c["i"], "男", day_boundary=policy)
+            assert [r["pillars"][k]["ganzhi"] for k in bazi.PILLAR_KEYS] == c["p"], (c["i"], policy)
+
+
 # ── 紫微斗數 ─────────────────────────────────────────────
 def test_ziwei_position_table():
     # 土五局：初一在午、初五在寅、廿一在戌；水二局：初一在丑、初二在寅

@@ -60,6 +60,19 @@ def test_day_boundary():
     assert mid["day_pillar"] == "戊午"   # 不換
 
 
+def test_night_zi_hour_pillar():
+    """23 時的時干一律以次日日干起；策略只決定日柱是否提前換日。"""
+    # 2000-01-07 為甲子日：23:30 應為丙子時（與次日 00:30 同柱），不是甲子時
+    expect_day = {"zi_initial_23": "乙丑", "midnight_00": "甲子", "split_zi": "甲子"}
+    for policy, day in expect_day.items():
+        r = gz.compute_sizhu(2000, 1, 7, 23, 30, day_boundary=policy)
+        assert (r["day_pillar"], r["hour_pillar"]) == (day, "丙子"), policy
+        assert r["night_zi"] == (policy == "split_zi")
+    assert gz.compute_sizhu(2000, 1, 8, 0, 30)["hour_pillar"] == "丙子"
+    assert gz.compute_sizhu(2000, 1, 7, 0, 30)["hour_pillar"] == "甲子"      # 早子時仍依當日
+    assert gz.compute_sizhu(2000, 1, 7, 22, 30, day_boundary="split_zi")["hour_pillar"] == "乙亥"
+
+
 def test_xunkong():
     assert C.xunkong(0) == ("戌", "亥")    # 甲子旬
     assert C.xunkong(10) == ("申", "酉")   # 甲戌旬

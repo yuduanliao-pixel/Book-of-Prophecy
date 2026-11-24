@@ -7,7 +7,7 @@ from . import cast
 from . import ganzhi as gz
 from . import zhuanggua as zg
 
-VERSION = "1.1.0"
+VERSION = "1.1.1"
 
 # 占問類別 → 用神六親（供補充標示，不作斷卦）
 CATEGORY_TO_YONGSHEN = {
