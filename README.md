@@ -49,6 +49,8 @@ jingfang-liuyao/
 ├── scripts/mingpan.py    # skill 工具：輸出 JSON 命盤（八字／紫微）
 ├── app/paipan.py         # 離線執行檔進入點
 ├── references/           # 速查表、八宮 64 卦對照、節氣權威覆蓋表
+├── CHANGELOG.md          # 變更紀錄
+├── docs/DECISIONS.md     # 決策紀錄與未決事項
 ├── tests/test_engine.py  # 六爻引擎驗收測試
 ├── tests/test_mingpan.py # 農曆／八字／紫微驗收測試（含 fixtures/ 對照案例）
 └── build/build_exe.ps1   # PyInstaller 打包腳本
