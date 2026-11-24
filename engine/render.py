@@ -151,6 +151,10 @@ def render_text(chart: dict) -> str:
                        f"→ {m['to_liuqin']}{m['to']}{mk}")
     else:
         out.append("- 動爻：無（六爻安靜，以靜論）")
+    if z.get("fuyin"):
+        out.append("- 伏吟：" + "、".join(z["fuyin"]) + "（動爻化出地支不變）")
+    if z.get("fanyin"):
+        out.append("- 反吟：" + "、".join(z["fanyin"]) + "（動爻化出與本爻相沖）")
     # 日辰與各爻關係
     rels = []
     for y in z["yaos"]:

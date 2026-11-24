@@ -147,6 +147,34 @@ def test_cast_face_values():
     assert cast.make_line(["字", "字", "字"])["name"] == "老陰"   # 0背=6
 
 
+def test_gregorian_from_jd_rounding():
+    """接近午夜的時刻四捨五入到分鐘時須正確進位到隔日（舊版會無限遞迴）。"""
+    from engine import solar_terms as st
+    for args in [(2026, 6, 13, 2, 19), (2000, 1, 1, 0, 0), (2024, 2, 29, 23, 59)]:
+        y, m, d, h, mi = args
+        assert st.gregorian_from_jd(st.jd_from_gregorian(y, m, d + (h * 60 + mi) / 1440.0)) == args
+    late = (23 * 3600 + 59 * 60 + 45) / 86400.0                 # 23:59:45
+    assert st.gregorian_from_jd(st.jd_from_gregorian(2026, 6, 13 + late)) == (2026, 6, 14, 0, 0)
+    assert st.gregorian_from_jd(st.jd_from_gregorian(2026, 12, 31 + late)) == (2027, 1, 1, 0, 0)
+
+
+def test_fuyin_fanyin_marks():
+    # 火天大有 二、三爻動 → 火雷噬嗑：內卦乾化震，寅化寅、辰化辰 → 伏吟
+    z = zg.zhuang((1, 1, 1, 1, 0, 1), (False, True, True, False, False, False),
+                  day_gan="壬", day_zhi="寅", month_branch="亥", xunkong=("辰", "巳"))
+    assert z["changed"]["name"] == "火雷噬嗑"
+    assert "伏吟" in z["yaos"][1]["changed"]["marks"] and "伏吟" in z["yaos"][2]["changed"]["marks"]
+    assert z["fuyin"] == ["內卦"] and z["fanyin"] == []
+    # 坤為地 二、三爻動 → 內卦坤化巽：巳化亥、卯化酉 → 反吟
+    z = zg.zhuang((0, 0, 0, 0, 0, 0), (False, True, True, False, False, False), day_gan="甲")
+    assert "反吟" in z["yaos"][1]["changed"]["marks"] and "反吟" in z["yaos"][2]["changed"]["marks"]
+    assert z["fanyin"] == ["內卦"] and z["fuyin"] == []
+    # 一般動爻不標
+    z = zg.zhuang((1, 1, 1, 1, 1, 1), (True, False, False, False, False, False), day_gan="甲")
+    assert z["fuyin"] == [] and z["fanyin"] == []
+    assert not {"伏吟", "反吟"} & set(z["yaos"][0]["changed"]["marks"])
+
+
 if __name__ == "__main__":
     funcs = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
     passed = 0
